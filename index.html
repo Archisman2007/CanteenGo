@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CanteenGo</title>
+<style>
+:root{--brand:#f26b1d;--brand-d:#c9520c;--green:#1f9d55;--bg:#fff8f1;--card:#fff;--ink:#2b2118;--mute:#7a6c5f;--line:#f0e2d3;--red:#d64545;--blue:#2f6fdb;--amber:#e8a317}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+header{background:var(--brand);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:10}
+.logo{font-weight:800;font-size:1.3rem;letter-spacing:.3px}.logo small{font-weight:500;opacity:.85;font-size:.75rem;margin-left:6px}
+.who{font-size:.85rem;display:flex;gap:10px;align-items:center}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:9px 16px;background:var(--brand);color:#fff;font-weight:600}
+button:hover{background:var(--brand-d)}button.ghost{background:transparent;color:inherit;border:1.5px solid currentColor}
+button.sec{background:#fff;color:var(--brand);border:1.5px solid var(--brand)}button.sm{padding:5px 10px;font-size:.8rem;border-radius:8px}
+button.green{background:var(--green)}button.red{background:var(--red)}button:disabled{opacity:.45;cursor:not-allowed}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 80px}
+nav.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:18px;border-bottom:2px solid var(--line)}
+nav.tabs button{background:none;color:var(--mute);border-radius:10px 10px 0 0;padding:10px 16px;white-space:nowrap}
+nav.tabs button.on{color:var(--brand);border-bottom:3px solid var(--brand);background:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(80,40,0,.05)}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.g3{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+h2{margin:0 0 12px}h3{margin:0 0 8px}
+.muted{color:var(--mute);font-size:.88rem}
+input,select,textarea{font:inherit;padding:9px 11px;border:1.5px solid var(--line);border-radius:9px;width:100%;background:#fff}
+label{display:block;font-size:.85rem;font-weight:600;margin:10px 0 4px}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:700}
+.s-Placed{background:#e6efff;color:var(--blue)}.s-Preparing{background:#fff1d6;color:#a56b00}.s-Ready{background:#dff5e8;color:var(--green)}.s-Collected{background:#eee;color:#666}.s-Cancelled{background:#fde4e4;color:var(--red)}
+.hero{text-align:center;padding:40px 10px}
+.hero h1{font-size:2.4rem;margin:0}.hero p{max-width:560px;margin:10px auto 26px;color:var(--mute)}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:760px;margin:0 auto}
+.role{text-align:left}.role .ic{font-size:2.2rem}
+.item{display:flex;flex-direction:column;gap:6px}.item .em{font-size:2.2rem}.item .row{display:flex;justify-content:space-between;align-items:center}
+.price{font-weight:800;color:var(--brand)}
+.qty{display:flex;align-items:center;gap:8px}.qty button{padding:3px 11px}
+.cartbar{position:sticky;bottom:10px;margin-top:16px}
+.stat{text-align:center}.stat b{display:block;font-size:1.9rem;color:var(--brand)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mute);font-size:.78rem;text-transform:uppercase}
+.tablewrap{overflow-x:auto}
+.seats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-width:420px}
+.seat{padding:10px 0;text-align:center;border-radius:9px;font-weight:700;font-size:.85rem;background:#dff5e8;color:var(--green);border:2px solid transparent;cursor:pointer}
+.seat.taken{background:#eee;color:#aaa;cursor:not-allowed}.seat.mine{background:var(--brand);color:#fff}.seat.sel{border-color:var(--ink)}
+.legend span{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 4px 0 12px;vertical-align:middle}
+.token{font-size:1.9rem;font-weight:900;letter-spacing:2px;color:var(--brand)}
+.qr{display:grid;grid-template-columns:repeat(9,9px);gap:1px;width:89px;height:89px;background:#fff;padding:0}
+.qr i{display:block;width:9px;height:9px;background:#fff}.qr i.k{background:#222}
+.order{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.bar{height:18px;background:#f4e9dc;border-radius:6px;overflow:hidden;margin:3px 0 9px}.bar div{height:100%;background:var(--brand);color:#fff;font-size:.7rem;padding-left:6px;line-height:18px}
+.bar.g div{background:var(--green)}.bar.r div{background:var(--red)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2b2118;color:#fff;padding:11px 20px;border-radius:10px;z-index:99;opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1}
+.stars button{background:none;color:#ccc;font-size:1.6rem;padding:0 3px}.stars button.on{color:var(--amber)}
+.hint{background:#fff1d6;border-radius:8px;padding:7px 10px;font-size:.8rem;margin-top:10px}
+@media(max-width:600px){.hero h1{font-size:1.8rem}header{padding:10px 12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🍽️ CanteenGo<small>Skip the queue. Waste less.</small></div>
+  <div class="who" id="who"></div>
+</header>
+<main id="app"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA LAYER (localStorage, shared by student & admin tabs) ============ */
+const KEY='canteengo_v1';
+const SLOTS=['12:00 PM','12:30 PM','01:00 PM','01:30 PM','02:00 PM'];
+const ROWS=['A','B','C','D','E'],COLS=6;
+const STATUS=['Placed','Preparing','Ready','Collected'];
+const ADMIN_PASS='admin123';
+
+function seed(){
+  return {nextToken:1,
+    menu:[
+      {id:1,name:'Veg Thali',cat:'Meals',price:60,stock:40,em:'🍛',on:true},
+      {id:2,name:'Chicken Biryani',cat:'Meals',price:90,stock:30,em:'🍗',on:true},
+      {id:3,name:'Veg Fried Rice',cat:'Meals',price:60,stock:30,em:'🍚',on:true},
+      {id:4,name:'Chowmein',cat:'Snacks',price:50,stock:35,em:'🍜',on:true},
+      {id:5,name:'Egg Roll',cat:'Snacks',price:40,stock:40,em:'🌯',on:true},
+      {id:6,name:'Samosa (2 pcs)',cat:'Snacks',price:20,stock:60,em:'🥟',on:true},
+      {id:7,name:'Masala Dosa',cat:'Snacks',price:50,stock:25,em:'🥞',on:true},
+      {id:8,name:'Paratha & Aloo Dum',cat:'Meals',price:40,stock:30,em:'🫓',on:true},
+      {id:9,name:'Tea',cat:'Drinks',price:10,stock:100,em:'☕',on:true},
+      {id:10,name:'Cold Coffee',cat:'Drinks',price:40,stock:30,em:'🥤',on:true}],
+    orders:[],seats:{},feedback:[]};
+}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.menu)return s}catch(e){}return seed()}
+let S=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+window.addEventListener('storage',e=>{if(e.key===KEY){S=load();render()}});
+
+let me=null;try{me=JSON.parse(sessionStorage.getItem('cg_me'))}catch(e){}
+function setMe(v){me=v;try{v?sessionStorage.setItem('cg_me',JSON.stringify(v)):sessionStorage.removeItem('cg_me')}catch(e){}}
+let tab='menu',cart={},selSlot=SLOTS[0],selSeat=null,seatSlot=SLOTS[0],rating=0,menuCat='All',editId=null;
+
+/* ============ HELPERS ============ */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2200)}
+const inr=n=>'₹'+n;
+const tokenStr=n=>'CG-'+String(n).padStart(3,'0');
+function qrHtml(seed){let h=0;for(const c of seed)h=(h*31+c.charCodeAt(0))>>>0;let o='';
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++){const corner=(r<3&&c<3)||(r<3&&c>5)||(r>5&&c<3);h=(h*1103515245+12345)>>>0;
+    o+=`<i class="${corner?(((r%2==0&&c%2==0)||(r==1&&c==1)||(r==1&&c==7)||(r==7&&c==1))?'k':''):((h>>16)&1?'k':'')}"></i>`}
+  return `<div class="qr">${o}</div>`}
+function seatMap(slot){return S.seats[slot]||(S.seats[slot]={})}
+function mySeat(slot){const m=seatMap(slot);for(const k in m)if(m[k].roll===me.roll)return k;return null}
+
+/* ============ RENDER ROUTER ============ */
+function render(){
+  const w=$('who');
+  if(!me){w.innerHTML='';$('app').innerHTML=landing();return}
+  w.innerHTML=`<span>${me.role==='admin'?'👨‍🍳 Admin':'🎓 '+esc(me.name)+' ('+esc(me.section)+')'}</span><button class="ghost sm" onclick="logout()">Logout</button>`;
+  $('app').innerHTML=me.role==='admin'?adminView():userView();
+}
+function logout(){setMe(null);cart={};tab='menu';render()}
+function go(t){tab=t;render()}
+
+/* ============ LANDING / LOGIN ============ */
+let loginMode=null;
+function landing(){
+  if(!loginMode)return `<div class="hero"><h1>Order smart. Eat fresh. 🍽️</h1>
+  <p>CanteenGo lets you pre-order meals, get an online token and reserve a seat — so you spend less time in the queue and the canteen wastes less food.</p>
+  <div class="roles">
+   <div class="card role"><div class="ic">🎓</div><h3>Student</h3><p class="muted">Pre-order, get your token, book a seat.</p><button onclick="loginMode='user';render()">Continue as Student</button></div>
+   <div class="card role"><div class="ic">👨‍🍳</div><h3>Canteen Admin</h3><p class="muted">Manage orders, menu, seats & demand.</p><button class="sec" onclick="loginMode='admin';render()">Continue as Admin</button></div>
+  </div></div>`;
+  if(loginMode==='user')return `<div class="card" style="max-width:420px;margin:30px auto"><h2>Student Login</h2>
+   <label>Full name</label><input id="ln" placeholder="e.g. Rahul Sen">
+   <label>Roll no.</label><input id="lr" placeholder="e.g. 37">
+   <label>Section</label><input id="ls" placeholder="e.g. B1">
+   <p><button onclick="doUser()" style="width:100%;margin-top:14px">Enter CanteenGo</button></p>
+   <p><button class="ghost sm" style="color:var(--mute)" onclick="loginMode=null;render()">← Back</button></p></div>`;
+  return `<div class="card" style="max-width:420px;margin:30px auto"><h2>Admin Login</h2>
+   <label>Password</label><input id="lp" type="password" onkeydown="if(event.key==='Enter')doAdmin()">
+   <div class="hint">Demo password: <b>admin123</b></div>
+   <p><button onclick="doAdmin()" style="width:100%;margin-top:14px">Login</button></p>
+   <p><button class="ghost sm" style="color:var(--mute)" onclick="loginMode=null;render()">← Back</button></p></div>`;
+}
+function doUser(){const n=$('ln').value.trim(),r=$('lr').value.trim(),s=$('ls').value.trim().toUpperCase();
+  if(!n||!r||!s)return toast('Please fill all fields');setMe({role:'user',name:n,roll:r,section:s});loginMode=null;tab='menu';render()}
+function doAdmin(){if($('lp').value!==ADMIN_PASS)return toast('Wrong password');setMe({role:'admin'});loginMode=null;tab='dash';render()}
+
+/* ============ STUDENT SIDE ============ */
+function userView(){
+  const tabs=[['menu','🍴 Menu & Pre-order'],['seats','💺 Book Seat'],['orders','🎟️ My Tokens'],['fb','⭐ Feedback']];
+  return `<nav class="tabs">${tabs.map(t=>`<button class="${tab===t[0]?'on':''}" onclick="go('${t[0]}')">${t[1]}</button>`).join('')}</nav>`+
+   ({menu:uMenu,seats:uSeats,orders:uOrders,fb:uFeedback}[tab]||uMenu)();
+}
+function cartTotals(){let n=0,t=0;for(const id in cart){const m=S.menu.find(x=>x.id==id);if(m){n+=cart[id];t+=cart[id]*m.price}}return{n,t}}
+function uMenu(){
+  const cats=['All',...new Set(S.menu.map(m=>m.cat))];const {n,t}=cartTotals();
+  const list=S.menu.filter(m=>menuCat==='All'||m.cat===menuCat);
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">${cats.map(c=>`<button class="${menuCat===c?'':'sec'} sm" onclick="menuCat='${c}';render()">${c}</button>`).join('')}</div>
+  <div class="grid g3">${list.map(m=>{const out=!m.on||m.stock<=0;return `<div class="card item" style="${out?'opacity:.55':''}">
+    <div class="em">${m.em}</div><div class="row"><b>${esc(m.name)}</b><span class="price">${inr(m.price)}</span></div>
+    <div class="muted">${out?'Currently unavailable':m.stock+' left'}</div>
+    ${out?'':`<div class="qty"><button class="sec sm" onclick="chg(${m.id},-1)">−</button><b>${cart[m.id]||0}</b><button class="sm" onclick="chg(${m.id},1)">+</button></div>`}</div>`}).join('')}</div>
+  <div class="card cartbar" style="border:2px solid var(--brand)">
+   <div class="order"><div><b>${n} item(s)</b> · <span class="price">${inr(t)}</span><div class="muted">Pre-ordering lets the kitchen prepare your food before you arrive.</div></div>
+   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="slotSel" style="width:auto" onchange="selSlot=this.value">${SLOTS.map(s=>`<option ${s===selSlot?'selected':''}>${s}</option>`).join('')}</select>
+   <button ${n?'':'disabled'} onclick="placeOrder()">Place order & get token</button></div></div></div>`;
+}
+function chg(id,d){const m=S.menu.find(x=>x.id===id);const q=(cart[id]||0)+d;if(q<0)return;if(q>m.stock)return toast('Only '+m.stock+' left');
+  if(q===0)delete cart[id];else cart[id]=q;render()}
+function placeOrder(){
+  const items=[];let total=0;
+  for(const id in cart){const m=S.menu.find(x=>x.id==id);if(!m||!m.on||m.stock<cart[id])return toast((m?m.name:'Item')+' is not available in that quantity');
+    items.push({id:m.id,name:m.name,qty:cart[id],price:m.price});total+=cart[id]*m.price}
+  if(!items.length)return;
+  items.forEach(i=>S.menu.find(x=>x.id===i.id).stock-=i.qty);
+  const o={id:Date.now(),token:tokenStr(S.nextToken++),user:me.name,roll:me.roll,section:me.section,items,total,slot:selSlot,status:'Placed',time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})};
+  S.orders.unshift(o);save();cart={};tab='orders';render();toast('Order placed! Your token: '+o.token);
+}
+function uOrders(){
+  const mine=S.orders.filter(o=>o.roll===me.roll&&o.user===me.name);
+  if(!mine.length)return `<div class="card muted">No orders yet. Go to the menu and pre-order your meal 🍴</div>`;
+  return `<div class="grid g2">${mine.map(o=>{const seat=mySeat(o.slot);return `<div class="card"><div class="order"><div>
+    <div class="muted">Token</div><div class="token">${o.token}</div><span class="pill s-${o.status}">${o.status}</span></div>${qrHtml(o.token)}</div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:12px 0">
+    ${o.items.map(i=>`<div style="display:flex;justify-content:space-between"><span>${i.qty} × ${esc(i.name)}</span><span>${inr(i.qty*i.price)}</span></div>`).join('')}
+    <div style="display:flex;justify-content:space-between;margin-top:6px"><b>Total</b><b class="price">${inr(o.total)}</b></div>
+    <div class="muted" style="margin-top:6px">Pickup slot: <b>${o.slot}</b> · Seat: <b>${seat?seat:'not booked'}</b></div>
+    ${o.status==='Placed'?`<button class="red sm" style="margin-top:10px" onclick="cancelOrder(${o.id})">Cancel order</button>`:''}
+    ${o.status==='Ready'?`<div class="hint" style="background:#dff5e8">✅ Your food is ready! Show this token at the counter.</div>`:''}
+    </div>`}).join('')}</div>`;
+}
+function cancelOrder(id){const o=S.orders.find(x=>x.id===id);if(!o||o.status!=='Placed')return;o.status='Cancelled';o.items.forEach(i=>{const m=S.menu.find(x=>x.id===i.id);if(m)m.stock+=i.qty});save();render();toast('Order cancelled')}
+function uSeats(){
+  const m=seatMap(seatSlot),mine=mySeat(seatSlot);
+  return `<div class="card"><h2>Book a seat</h2><p class="muted">Pick a time slot, then tap a free seat. One seat per student per slot.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">${SLOTS.map(s=>`<button class="${seatSlot===s?'':'sec'} sm" onclick="seatSlot='${s}';selSeat=null;render()">${s}</button>`).join('')}</div>
+  <div class="legend muted"><span style="background:#dff5e8"></span>Free<span style="background:#eee"></span>Taken<span style="background:var(--brand)"></span>Yours</div><br>
+  <div class="seats">${ROWS.map(r=>Array.from({length:COLS},(_,c)=>{const id=r+(c+1);const t=m[id];
+   const cls=t?(t.roll===me.roll?'mine':'taken'):(selSeat===id?'sel':'');return `<div class="seat ${cls}" onclick="pickSeat('${id}')">${id}</div>`}).join('')).join('')}</div>
+  <p style="margin-top:16px">${mine?`You have seat <b>${mine}</b> for ${seatSlot}. <button class="red sm" onclick="releaseSeat()">Release</button>`:
+    `<button ${selSeat?'':'disabled'} onclick="bookSeat()">Book seat ${selSeat||''}</button>`}</p></div>`;
+}
+function pickSeat(id){const m=seatMap(seatSlot);if(m[id])return;if(mySeat(seatSlot))return toast('You already have a seat for this slot');selSeat=id;render()}
+function bookSeat(){const m=seatMap(seatSlot);if(m[selSeat])return toast('Seat just got taken');m[selSeat]={name:me.name,roll:me.roll,section:me.section};selSeat=null;save();render();toast('Seat booked!')}
+function releaseSeat(){const m=seatMap(seatSlot),k=mySeat(seatSlot);if(k)delete m[k];save();render()}
+function uFeedback(){
+  return `<div class="card" style="max-width:520px"><h2>Rate your canteen experience</h2>
+  <div class="stars">${[1,2,3,4,5].map(i=>`<button class="${rating>=i?'on':''}" onclick="rating=${i};render()">★</button>`).join('')}</div>
+  <label>How much food did you leave / was wasted?</label><select id="fw"><option>None</option><option>A little</option><option>Quite a lot</option></select>
+  <label>Comments</label><textarea id="fc" rows="3" placeholder="What can we improve?"></textarea>
+  <p><button onclick="sendFb()">Submit feedback</button></p></div>`;
+}
+function sendFb(){if(!rating)return toast('Please give a rating');S.feedback.unshift({name:me.name,section:me.section,rating,waste:$('fw').value,comment:$('fc').value.trim(),time:new Date().toLocaleString()});save();rating=0;render();toast('Thanks for your feedback!')}
+
+/* ============ ADMIN SIDE ============ */
+function adminView(){
+  const tabs=[['dash','📊 Dashboard'],['aorders','📋 Orders'],['amenu','🍛 Menu & Stock'],['aseats','💺 Seats'],['afb','💬 Feedback'],['ins','📈 Survey Insights']];
+  return `<nav class="tabs">${tabs.map(t=>`<button class="${tab===t[0]?'on':''}" onclick="go('${t[0]}')">${t[1]}</button>`).join('')}</nav>`+
+   ({dash:aDash,aorders:aOrders,amenu:aMenu,aseats:aSeats,afb:aFb,ins:aInsights}[tab]||aDash)();
+}
+function aDash(){
+  const act=S.orders.filter(o=>o.status!=='Cancelled');
+  const rev=act.reduce((a,o)=>a+o.total,0),pend=S.orders.filter(o=>['Placed','Preparing'].includes(o.status)).length;
+  const booked=Object.values(S.seats).reduce((a,m)=>a+Object.keys(m).length,0);
+  // forecast: pre-ordered qty per item per slot (not yet collected)
+  const f={};act.filter(o=>o.status!=='Collected').forEach(o=>o.items.forEach(i=>{(f[i.name]=f[i.name]||{})[o.slot]=((f[i.name]||{})[o.slot]||0)+i.qty}));
+  const names=Object.keys(f);
+  return `<div class="grid g4"><div class="card stat"><b>${act.length}</b>Total orders</div><div class="card stat"><b>${pend}</b>Pending</div>
+   <div class="card stat"><b>${inr(rev)}</b>Pre-order revenue</div><div class="card stat"><b>${booked}</b>Seats booked</div></div>
+  <div class="card" style="margin-top:14px"><h3>🍳 Cooking forecast (from pre-orders)</h3>
+   <p class="muted">Cook what is actually ordered (+10% buffer) to cut food waste — survey: 53% of students say wastage is "Much" or "Too much".</p>
+   ${names.length?`<div class="tablewrap"><table><tr><th>Item</th>${SLOTS.map(s=>`<th>${s}</th>`).join('')}<th>Total</th><th>Suggested cook qty</th></tr>
+   ${names.map(n=>{const t=Object.values(f[n]).reduce((a,b)=>a+b,0);return `<tr><td>${esc(n)}</td>${SLOTS.map(s=>`<td>${f[n][s]||'–'}</td>`).join('')}<td><b>${t}</b></td><td><b>${Math.ceil(t*1.1)}</b></td></tr>`}).join('')}</table></div>`:'<div class="muted">No active pre-orders yet.</div>'}</div>
+  <div class="card" style="margin-top:14px"><h3>⚠️ Low stock</h3>${S.menu.filter(m=>m.stock<=10).map(m=>`<span class="pill s-Preparing" style="margin:2px">${esc(m.name)}: ${m.stock}</span>`).join('')||'<span class="muted">All items well stocked.</span>'}</div>`;
+}
+function aOrders(){
+  return `<div class="card" style="margin-bottom:14px"><h3>Verify token at counter</h3><div style="display:flex;gap:8px"><input id="vt" placeholder="e.g. CG-001" style="max-width:220px"><button onclick="verifyTok()">Verify & mark collected</button></div></div>
+  <div class="card tablewrap"><h3>All orders</h3>${S.orders.length?`<table><tr><th>Token</th><th>Student</th><th>Items</th><th>Slot</th><th>Total</th><th>Status</th><th>Action</th></tr>
+  ${S.orders.map(o=>{const i=STATUS.indexOf(o.status);return `<tr><td><b>${o.token}</b></td><td>${esc(o.user)}<div class="muted">${esc(o.section)} · Roll ${esc(o.roll)}</div></td>
+   <td>${o.items.map(x=>x.qty+'× '+esc(x.name)).join('<br>')}</td><td>${o.slot}</td><td>${inr(o.total)}</td><td><span class="pill s-${o.status}">${o.status}</span></td>
+   <td>${o.status==='Cancelled'||o.status==='Collected'?'':`<button class="sm green" onclick="advance(${o.id})">→ ${STATUS[i+1]}</button> <button class="sm red" onclick="adminCancel(${o.id})">✕</button>`}</td></tr>`}).join('')}</table>`:'<div class="muted">No orders yet. Place one from the student side (open a second tab).</div>'}</div>`;
+}
+function advance(id){const o=S.orders.find(x=>x.id===id),i=STATUS.indexOf(o.status);if(i<STATUS.length-1)o.status=STATUS[i+1];save();render()}
+function adminCancel(id){cancelOrder(id)}
+function verifyTok(){const v=$('vt').value.trim().toUpperCase();const o=S.orders.find(x=>x.token===v);
+  if(!o)return toast('Token not found');if(o.status==='Cancelled')return toast('That order was cancelled');if(o.status==='Collected')return toast('Already collected');
+  o.status='Collected';save();render();toast(v+' marked collected ('+o.user+')')}
+function aMenu(){
+  const e=S.menu.find(m=>m.id===editId)||{};
+  return `<div class="grid g2"><div class="card tablewrap"><h3>Menu items</h3><table><tr><th></th><th>Item</th><th>Price</th><th>Stock</th><th>Available</th><th></th></tr>
+  ${S.menu.map(m=>`<tr><td>${m.em}</td><td>${esc(m.name)}<div class="muted">${m.cat}</div></td><td>${inr(m.price)}</td>
+   <td><input type="number" min="0" value="${m.stock}" style="width:70px;padding:4px" onchange="setStock(${m.id},this.value)"></td>
+   <td><button class="sm ${m.on?'green':'sec'}" onclick="toggleItem(${m.id})">${m.on?'On':'Off'}</button></td>
+   <td><button class="sm sec" onclick="editId=${m.id};render()">Edit</button> <button class="sm red" onclick="delItem(${m.id})">✕</button></td></tr>`).join('')}</table></div>
+  <div class="card"><h3>${editId?'Edit item':'Add new item'}</h3>
+   <label>Name</label><input id="mn" value="${esc(e.name||'')}"><label>Emoji</label><input id="me" value="${e.em||'🍽️'}">
+   <label>Category</label><select id="mc">${['Meals','Snacks','Drinks'].map(c=>`<option ${e.cat===c?'selected':''}>${c}</option>`).join('')}</select>
+   <label>Price (₹)</label><input id="mp" type="number" min="0" value="${e.price||''}"><label>Stock</label><input id="ms" type="number" min="0" value="${e.stock??''}">
+   <p><button onclick="saveItem()">${editId?'Save changes':'Add item'}</button> ${editId?'<button class="sec" onclick="editId=null;render()">Cancel</button>':''}</p></div></div>`;
+}
+function setStock(id,v){S.menu.find(m=>m.id===id).stock=Math.max(0,parseInt(v)||0);save();toast('Stock updated')}
+function toggleItem(id){const m=S.menu.find(x=>x.id===id);m.on=!m.on;save();render()}
+function delItem(id){if(!confirm('Delete this item?'))return;S.menu=S.menu.filter(m=>m.id!==id);save();render()}
+function saveItem(){const n=$('mn').value.trim(),p=parseInt($('mp').value),s=parseInt($('ms').value);
+  if(!n||isNaN(p)||isNaN(s))return toast('Fill name, price and stock');
+  const d={name:n,em:$('me').value||'🍽️',cat:$('mc').value,price:p,stock:s};
+  if(editId)Object.assign(S.menu.find(m=>m.id===editId),d);else S.menu.push({id:Date.now(),on:true,...d});
+  editId=null;save();render();toast('Menu saved')}
+function aSeats(){
+  return `<div class="card"><h3>Seat bookings</h3><p class="muted">${ROWS.length*COLS} seats per slot.</p><div class="tablewrap"><table><tr><th>Slot</th><th>Booked</th><th>Free</th><th>Students</th><th></th></tr>
+  ${SLOTS.map(s=>{const m=seatMap(s),k=Object.keys(m);return `<tr><td><b>${s}</b></td><td>${k.length}</td><td>${ROWS.length*COLS-k.length}</td>
+   <td>${k.map(x=>`${x}: ${esc(m[x].name)} (${esc(m[x].section)})`).join('<br>')||'–'}</td><td>${k.length?`<button class="sm red" onclick="clearSlot('${s}')">Clear</button>`:''}</td></tr>`}).join('')}</table></div></div>`;
+}
+function clearSlot(s){if(!confirm('Clear all bookings for '+s+'?'))return;S.seats[s]={};save();render()}
+function aFb(){
+  const f=S.feedback,avg=f.length?(f.reduce((a,b)=>a+b.rating,0)/f.length).toFixed(1):'–';
+  return `<div class="card"><h3>Student feedback · avg rating ${avg} ★ (${f.length})</h3>${f.length?`<div class="tablewrap"><table><tr><th>Student</th><th>Rating</th><th>Waste</th><th>Comment</th><th>When</th></tr>
+  ${f.map(x=>`<tr><td>${esc(x.name)} (${esc(x.section)})</td><td>${'★'.repeat(x.rating)}</td><td>${x.waste}</td><td>${esc(x.comment)||'–'}</td><td class="muted">${x.time}</td></tr>`).join('')}</table></div>`:'<div class="muted">No feedback yet.</div>'}</div>`;
+}
+function bars(title,rows,cls=''){return `<div class="card"><h3>${title}</h3>${rows.map(r=>`<div>${r[0]} <span class="muted">(${r[1]} of ${r[2]||26})</span><div class="bar ${cls}"><div style="width:${(r[1]/(r[2]||26)*100).toFixed(1)}%">${(r[1]/(r[2]||26)*100).toFixed(1)}%</div></div></div>`).join('')}</div>`}
+function aInsights(){
+  return `<div class="card" style="margin-bottom:14px"><h3>Why CanteenGo?</h3><p class="muted">Survey of 26 first-year students (ECE, BSH dept) on the current canteen, plus feedback on the CanteenGo prototype from 10 students.</p></div>
+  <div class="grid g2">
+  ${bars('Waiting time for coupon',[['&gt; 7 min',8],['5–7 min',7],['3–5 min',4],['1–3 min',6],['&lt; 1 min',1]],'r')}
+  ${bars('Waiting time for collecting food',[['1–3 min',10],['3–5 min',8],['5–7 min',3],['&gt; 7 min',3],['&lt; 1 min',2]])}
+  ${bars('Finding a seat',[['Struggle to find a seat',23],['Easily find a seat',3]],'r')}
+  ${bars('Skipped a meal due to long queue?',[['Yes',15],['No',11]],'r')}
+  ${bars('Get preferred item?',[['Yes',16],['No',10]],'g')}
+  ${bars('How much food is wasted?',[['Too less',6],['Less',9],['Much',6],['Too much',5]])}
+  </div>
+  <h3 style="margin:18px 0 8px">CanteenGo prototype feedback (10 responses)</h3>
+  <div class="grid g2">${bars('Would use a mobile app',[['Yes',10,10]],'g')}</div>
+  <div class="grid g2" style="margin-top:14px">
+  ${bars('Online meal booking',[['Yes',8,10],['No',2,10]],'g')}${bars('Online token',[['Yes',8,10],['No',2,10]],'g')}${bars('Online seat booking',[['Yes',8,10],['No',2,10]],'g')}</div>`;
+}
+
+render();
+</script>
+</body>
+</html>
